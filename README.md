@@ -37,6 +37,50 @@ doesn't exist yet), `.venv\Scripts\python -m uvicorn backend.main:app --port 800
 Pick a household from the dropdown in the Profile tab — its 4 documents appear as one-click
 upload buttons that pull directly from `data/official_documents/`.
 
+## Free hosting
+
+A `Dockerfile` is included (listens on `$PORT`, defaults to 7860) so this deploys as-is to any
+container host. Two free options that need no credit card:
+
+### Option A — Hugging Face Spaces (recommended, no card required)
+
+1. Go to [huggingface.co/new-space](https://huggingface.co/new-space) (free account, no card).
+2. Space name: anything (e.g. `hacknation-realdoor`). **SDK: Docker**. Visibility: your choice.
+3. Once created, go to the Space's **Files** tab → **Add file → Upload files**, or (easier) under
+   **Settings → Repository** link it to push from git:
+   ```
+   git remote add space https://huggingface.co/spaces/<your-username>/<space-name>
+   git push space main
+   ```
+   (You'll need a Hugging Face access token as the password when it prompts for git credentials
+   — generate one at huggingface.co/settings/tokens with "write" scope.)
+4. **Settings → Variables and secrets → New secret** → add `OPENAI_API_KEY` (optional — the app
+   runs fully without it, per the README sections above). Add `REALDOOR_LLM_MODEL` /
+   `REALDOOR_EMBEDDING_MODEL` the same way only if you want to override the defaults.
+5. The Space builds the `Dockerfile` automatically and gives you a public URL
+   (`https://<your-username>-<space-name>.hf.space`).
+
+### Option B — Render.com (free web service tier)
+
+1. Push this repo to GitHub (already done — see the repo linked earlier in this conversation).
+2. [render.com](https://render.com) → **New → Web Service** → connect the GitHub repo.
+3. Runtime: **Docker** (it will detect the `Dockerfile` automatically) — or if you prefer not to
+   use Docker: Runtime **Python 3**, Build command `pip install -r requirements.txt`, Start
+   command `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`.
+4. **Environment** tab → add `OPENAI_API_KEY` as a secret if you want the optional features.
+5. Deploy. Free tier sleeps after ~15 minutes idle and wakes on the next request (a few seconds
+   of cold-start delay) — fine for a demo, not for a live production service.
+
+### Notes for either host
+
+- Sessions are in-memory by design (see `backend/session_store.py`) — they reset on every
+  redeploy/restart. That's the intended ephemeral behavior, not a bug.
+- `data/rag/embeddings.json` is gitignored and gets rebuilt automatically (one small OpenAI
+  embedding call over 78 chunks) the first time someone asks a narrative rules question after a
+  fresh deploy, if `OPENAI_API_KEY` is set.
+- Never put the real key in `.env` inside the repo — only in the host's secret/environment
+  variable UI. `.env` stays local-only (already gitignored).
+
 ### Optional: enable the LLM-assisted extraction fallback (incl. OCR/vision for scanned pages)
 
 The Profile stage works fully with **no LLM at all** for the 16 of 24 official documents that
