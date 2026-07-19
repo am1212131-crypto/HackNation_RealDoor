@@ -80,17 +80,45 @@
     }
   }
 
+  let currentHousehold = null;
+
   $("#household-select").addEventListener("change", () => {
-    const hh = households.find((h) => h.household_id === $("#household-select").value);
-    renderHouseholdDocs(hh);
-    if (hh) {
+    currentHousehold = households.find((h) => h.household_id === $("#household-select").value) || null;
+    renderHouseholdDocs(currentHousehold);
+    $("#upload-all-result").innerHTML = "";
+    if (currentHousehold) {
       $("#household-summary").textContent =
-        `Scenario: ${hh.scenario}. Household size ${hh.household_size}. Upload each document below, then confirm its fields.`;
-      $("#household-size").value = String(hh.household_size);
+        `Scenario: ${currentHousehold.scenario}. Household size ${currentHousehold.household_size}. ` +
+        `Upload documents one by one below, or use "Upload all" to load and confirm-ready all ${currentHousehold.documents.length} at once.`;
+      $("#household-size").value = String(currentHousehold.household_size);
+      $("#upload-all-btn").hidden = false;
     } else {
       $("#household-summary").textContent = "";
+      $("#upload-all-btn").hidden = true;
     }
   });
+
+  $("#upload-all-btn").addEventListener("click", () => uploadAllHouseholdDocs(currentHousehold));
+
+  async function uploadAllHouseholdDocs(hh) {
+    if (!hh) return;
+    if (!requireConsent()) return;
+    const resultEl = $("#upload-all-result");
+    const btn = $("#upload-all-btn");
+    btn.disabled = true;
+    const results = [];
+    for (const doc of hh.documents) {
+      announce(`Uploading ${doc.doc_type_label}…`);
+      const outcome = await uploadHouseholdDoc(hh.household_id, doc.filename, doc.doc_type, { skipConsentCheck: true });
+      results.push({ label: doc.doc_type_label, ...outcome });
+    }
+    btn.disabled = false;
+    const okCount = results.filter((r) => r.ok).length;
+    resultEl.innerHTML = `<ul>${results.map((r) =>
+      `<li>${r.ok ? "✓" : "✕"} ${r.label}${r.ok ? "" : ` — ${r.message}`}</li>`).join("")}</ul>`;
+    announce(`Uploaded ${okCount} of ${results.length} documents for ${hh.household_id}. ` +
+      (okCount < results.length ? "Some need a document-type pick or the LLM vision fallback — see the list above." : "Now confirm each field below."));
+  }
 
   function renderHouseholdDocs(hh) {
     const list = $("#sample-list");
@@ -113,12 +141,12 @@
     }
   }
 
-  async function uploadHouseholdDoc(householdId, filename, docType) {
-    if (!requireConsent()) return;
+  async function uploadHouseholdDoc(householdId, filename, docType, opts = {}) {
+    if (!opts.skipConsentCheck && !requireConsent()) return { ok: false, message: "Consent not given." };
     const res = await fetch(`/api/households/${householdId}/documents/${filename}`);
     const blob = await res.blob();
     const file = new File([blob], filename, { type: "application/pdf" });
-    await doUpload(file, docType);
+    return doUpload(file, docType);
   }
 
   function requireConsent() {
@@ -150,8 +178,10 @@
       const result = await api(`/api/session/${sessionId}/upload`, { method: "POST", body: fd });
       announce(`Extracted ${result.fields.length} allowlisted field(s) from ${result.doc_type_display}.`);
       renderDocument(result);
+      return { ok: true };
     } catch (e) {
       announce("Upload failed: " + e.message);
+      return { ok: false, message: e.message };
     }
   }
 
