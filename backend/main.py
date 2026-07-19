@@ -19,6 +19,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def no_cache_frontend(request, call_next):
+    """This is an actively-iterated prototype; a stale cached index.html/app.js
+    silently serving old behavior after an update is a worse failure mode than
+    the minor perf cost of disabling caching. Only affects the frontend assets
+    served by StaticFiles below, not the /api/* JSON responses."""
+    response = await call_next(request)
+    if not request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
+
 def _sess_or_404(session_id: str):
     if not session_store.exists(session_id):
         raise HTTPException(status_code=404, detail="Unknown or deleted session.")

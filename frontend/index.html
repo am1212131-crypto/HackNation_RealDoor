@@ -70,9 +70,13 @@
           <option value="benefit_letter">Benefit letter</option>
           <option value="gig_statement">Gig income statement</option>
         </select>
-        <label for="file-input">Choose PDF file</label>
-        <input type="file" id="file-input" accept="application/pdf">
-        <button type="button" id="upload-btn" disabled>Upload document</button>
+        <label for="file-input">Choose PDF file(s)</label>
+        <input type="file" id="file-input" accept="application/pdf" multiple>
+        <p class="hint">Selecting more than one file uploads them one by one with the document
+          type above applied to each. Leave "Auto-detect" selected only if all the files you
+          pick share the same type, or if none of them are scanned pages.</p>
+        <button type="button" id="upload-btn" disabled>Upload document(s)</button>
+        <div id="custom-upload-result" role="status" aria-live="polite"></div>
       </div>
     </div>
 

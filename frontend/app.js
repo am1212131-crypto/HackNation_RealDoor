@@ -164,9 +164,27 @@
 
   $("#upload-btn").addEventListener("click", async () => {
     if (!requireConsent()) return;
-    const file = $("#file-input").files[0];
+    const files = Array.from($("#file-input").files);
+    if (!files.length) return;
     const docType = $("#doc-type-select").value || null;
-    await doUpload(file, docType);
+    const btn = $("#upload-btn");
+    const resultEl = $("#custom-upload-result");
+    btn.disabled = true;
+    const results = [];
+    for (const file of files) {
+      announce(`Uploading ${file.name}…`);
+      const outcome = await doUpload(file, docType);
+      results.push({ name: file.name, ...outcome });
+    }
+    btn.disabled = false;
+    if (files.length > 1) {
+      const okCount = results.filter((r) => r.ok).length;
+      resultEl.innerHTML = `<ul>${results.map((r) =>
+        `<li>${r.ok ? "✓" : "✕"} ${r.name}${r.ok ? "" : ` — ${r.message}`}</li>`).join("")}</ul>`;
+      announce(`Uploaded ${okCount} of ${results.length} files.`);
+    }
+    $("#file-input").value = "";
+    btn.disabled = true;
   });
 
   async function doUpload(file, docType) {
