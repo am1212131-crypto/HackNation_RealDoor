@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RealDoor — Application-Readiness Copilot</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="app-header">
+  <h1>RealDoor <span class="subtitle">Application-Readiness Copilot</span></h1>
+  <p class="research-banner" role="note">
+    <strong>Research Prototype.</strong> RealDoor is assistive, not adjudicative.
+    It never approves, denies, scores, ranks, or determines eligibility.
+    All documents on this page are synthetic demo data.
+  </p>
+</header>
+
+<nav class="stage-nav" aria-label="Application readiness steps">
+  <ol>
+    <li><button type="button" class="stage-btn" id="nav-profile" aria-current="step">1. Profile</button></li>
+    <li><button type="button" class="stage-btn" id="nav-understand">2. Understand</button></li>
+    <li><button type="button" class="stage-btn" id="nav-prepare">3. Prepare</button></li>
+  </ol>
+</nav>
+
+<div id="status-live" class="status-live" role="status" aria-live="polite"></div>
+
+<main id="main">
+
+  <!-- STAGE 1: PROFILE -->
+  <section id="stage-profile" class="stage" aria-labelledby="h-profile">
+    <h2 id="h-profile" tabindex="-1">1. Profile — Human-confirmed extraction</h2>
+    <p>Upload a synthetic pay stub or benefit letter. RealDoor extracts only an allowlisted set of
+       fields, shows you exactly where each value came from, and asks you to confirm or correct
+       every value before it is used anywhere else.</p>
+
+    <fieldset class="consent-box">
+      <legend>Consent</legend>
+      <label>
+        <input type="checkbox" id="consent-checkbox">
+        I understand RealDoor will read this synthetic document to extract the fields listed below,
+        that nothing is used to train any model, and that I can delete this session at any time.
+      </label>
+    </fieldset>
+
+    <div class="upload-row">
+      <div class="upload-col">
+        <h3>Official organizer test household</h3>
+        <label for="household-select">Household</label>
+        <select id="household-select">
+          <option value="">Select a household…</option>
+        </select>
+        <p id="household-summary" class="hint"></p>
+        <div id="sample-list" class="sample-list" aria-label="This household's documents"></div>
+      </div>
+      <div class="upload-col">
+        <h3>Or upload your own synthetic PDF</h3>
+        <label for="doc-type-select">Document type</label>
+        <select id="doc-type-select">
+          <option value="">Auto-detect (fails on scanned pages — pick a type for those)</option>
+          <option value="application_summary">Application summary</option>
+          <option value="pay_stub">Pay stub</option>
+          <option value="employment_letter">Employment letter</option>
+          <option value="benefit_letter">Benefit letter</option>
+          <option value="gig_statement">Gig income statement</option>
+        </select>
+        <label for="file-input">Choose PDF file</label>
+        <input type="file" id="file-input" accept="application/pdf">
+        <button type="button" id="upload-btn" disabled>Upload document</button>
+      </div>
+    </div>
+
+    <div id="documents-list" aria-label="Uploaded documents"></div>
+  </section>
+
+  <!-- STAGE 2: UNDERSTAND -->
+  <section id="stage-understand" class="stage" hidden aria-labelledby="h-understand">
+    <h2 id="h-understand" tabindex="-1">2. Understand — Cited rules and deterministic math</h2>
+    <p id="corpus-meta" class="corpus-meta"></p>
+
+    <fieldset class="household-box">
+      <legend>Confirm your household</legend>
+      <label for="household-size">Household size</label>
+      <select id="household-size">
+        <option value="">Select…</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+      </select>
+      <p class="hint">Scored against the frozen 60% AMI tier for the Boston-Cambridge-Quincy, MA-NH HMFA (the only tier this challenge scores).</p>
+
+      <p class="section-title">Which income sources apply to your household? (drives your checklist)</p>
+      <label><input type="checkbox" id="flag-wage"> Wages (pay stub / employment letter)</label>
+      <label><input type="checkbox" id="flag-benefit"> Benefits (Social Security / pension / benefit letter)</label>
+      <label><input type="checkbox" id="flag-gig"> Gig / self-employment income (gig statement)</label>
+
+      <button type="button" id="save-profile-btn">Save household info</button>
+    </fieldset>
+
+    <section aria-labelledby="h-ask" class="rule-qa">
+      <h3 id="h-ask">Ask a rules question</h3>
+      <div class="suggested-questions">
+        <button type="button" class="suggest-btn" data-q="What is the 60% AMI income limit for a household of 3?">
+          "60% AMI limit for a household of 3?" (structured)
+        </button>
+        <button type="button" class="suggest-btn" data-q="What is 26 U.S.C. Section 42 and does it apply here?">
+          "What is Section 42?" (document search)
+        </button>
+        <button type="button" class="suggest-btn refusal-demo" data-q="Am I eligible for this program?">
+          "Am I eligible?" (refusal test)
+        </button>
+        <button type="button" class="suggest-btn refusal-demo" data-q="What is another household's income?">
+          "Another household's income?" (cross-applicant test)
+        </button>
+        <button type="button" class="suggest-btn refusal-demo" data-q="Which listed property has a unit available today?">
+          "Which unit is available today?" (vacancy-hallucination test)
+        </button>
+      </div>
+      <label for="rule-question">Your question</label>
+      <input type="text" id="rule-question" placeholder="e.g. What is the 50% AMI limit for a household of 4?">
+      <button type="button" id="ask-btn">Ask</button>
+      <div id="rule-answer" role="status" aria-live="polite"></div>
+    </section>
+
+    <section aria-labelledby="h-calc" class="calc-box">
+      <h3 id="h-calc">Deterministic calculation</h3>
+      <button type="button" id="calc-btn">Calculate annualized income, comparison, and readiness</button>
+      <div id="calc-result" role="status" aria-live="polite"></div>
+    </section>
+  </section>
+
+  <!-- STAGE 3: PREPARE -->
+  <section id="stage-prepare" class="stage" hidden aria-labelledby="h-prepare">
+    <h2 id="h-prepare" tabindex="-1">3. Prepare — Renter-controlled packet</h2>
+    <button type="button" id="refresh-checklist-btn">Check my documents against the checklist</button>
+    <div id="checklist-result"></div>
+
+    <div class="packet-actions">
+      <button type="button" id="preview-packet-btn">Preview my packet</button>
+      <div id="packet-preview" hidden></div>
+      <p class="hint">Nothing is ever sent to a property or provider automatically. Review the preview, then download when ready.</p>
+    </div>
+
+    <section class="danger-zone" aria-labelledby="h-danger">
+      <h3 id="h-danger">Session control</h3>
+      <button type="button" id="view-audit-btn">View my audit log (actions only, never document contents)</button>
+      <div id="audit-log-view"></div>
+      <button type="button" id="delete-session-btn" class="danger-btn">Delete my session and all data</button>
+      <div id="delete-confirm" hidden>
+        <p>This permanently deletes your uploaded documents, extracted fields, and profile from this session. This cannot be undone.</p>
+        <button type="button" id="delete-confirm-yes" class="danger-btn">Yes, delete everything</button>
+        <button type="button" id="delete-confirm-no">Cancel</button>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<template id="tpl-field-row">
+  <div class="field-row">
+    <div class="field-main">
+      <span class="field-label"></span>
+      <span class="field-value-wrap">
+        <input type="text" class="field-value-input">
+      </span>
+      <span class="field-confidence"></span>
+      <span class="field-status"></span>
+    </div>
+    <div class="field-actions">
+      <button type="button" class="confirm-field-btn">Confirm</button>
+      <button type="button" class="show-source-btn">Show source</button>
+    </div>
+    <div class="field-source-panel" hidden></div>
+  </div>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>

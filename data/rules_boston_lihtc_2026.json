@@ -1,0 +1,76 @@
+{
+  "corpus_id": "hacknation-realdoor-2026",
+  "corpus_version": "2026.1",
+  "program_name": "LIHTC (Section 42) application-readiness simulation -- Hack-Nation RealDoor challenge",
+  "metro_area": "Boston-Cambridge-Quincy, MA-NH HUD Metro FMR Area",
+  "rule_year": 2026,
+  "event_date": "2026-07-18",
+  "median_family_income": 164600,
+  "effective_date": "2026-05-01",
+  "scored_ami_tier": "60",
+  "document_currency_window_days": 60,
+  "sources": [
+    {
+      "id": "src-mtsp",
+      "title": "HUD FY 2026 MTSP Income Limits",
+      "file": "mtsp_2026_boston_cambridge_quincy.csv",
+      "publisher": "U.S. Department of Housing and Urban Development",
+      "url": "https://www.huduser.gov/portal/datasets/mtsp/mtsp26/HERA-Income-Limits-Report-FY26.pdf",
+      "locator": "PDF page 130",
+      "effective_date": "2026-05-01"
+    },
+    {
+      "id": "src-lihtc-db",
+      "title": "HUD LIHTC Property Database",
+      "file": "lihtc_boston_metro_subset.csv",
+      "publisher": "U.S. Department of Housing and Urban Development",
+      "url": "https://www.huduser.gov/portal/datasets/lihtc/property.html",
+      "note": "Project locations only -- not a vacancy, rent, waitlist, or application-status feed."
+    },
+    {
+      "id": "src-statute",
+      "title": "26 U.S.C. Section 42 (LIHTC federal statute)",
+      "file": null,
+      "publisher": "U.S. Code",
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section42&num=0&edition=prelim"
+    },
+    {
+      "id": "src-cfr",
+      "title": "26 CFR 1.42-5 (compliance monitoring)",
+      "file": null,
+      "publisher": "eCFR",
+      "url": "https://www.ecfr.gov/current/title-26/section-1.42-5"
+    },
+    {
+      "id": "src-challenge-rules",
+      "title": "Frozen RealDoor challenge rules",
+      "file": "rules/RULES_README.md",
+      "publisher": "Hack-Nation RealDoor organizers",
+      "note": "Hackathon-simulation conventions (annualization method, 60-day document currency, READY_TO_REVIEW/NEEDS_REVIEW), not universal LIHTC rules."
+    }
+  ],
+  "income_limits_annual": {
+    "unit": "USD/year",
+    "description": "FY2026 MTSP annual gross household income limit by household size for Boston-Cambridge-Quincy, MA-NH HMFA.",
+    "source_id": "src-mtsp",
+    "tiers": {
+      "50": [60000, 68600, 77150, 85700, 92600, 99450, 106300, 113150],
+      "60": [72000, 82320, 92580, 102840, 111120, 119340, 127560, 135780]
+    },
+    "household_size_index_note": "Array index 0 = household size 1 ... index 7 = household size 8."
+  },
+  "annualization": {
+    "source_id": "src-challenge-rules",
+    "periods_per_year": {"weekly": 52, "biweekly": 26, "semimonthly": 24, "monthly": 12, "annual": 1},
+    "wage_formula": "regular_hours * hourly_rate * periods_per_year[pay_frequency]",
+    "benefit_formula": "monthly_benefit * periods_per_year[benefit_frequency]",
+    "gig_formula": "gross_receipts * 12  (one calendar-month statement annualized; always flagged GIG_INCOME_UNCORROBORATED unless a corroborating document is also present)",
+    "note": "Reported gross_pay on a pay stub is used only to cross-check regular_hours * hourly_rate; a mismatch is flagged as PAY_STUB_TOTAL_CONFLICT but does not change the computed annualized figure."
+  },
+  "abstention_rules": [
+    "If household size is outside 1-8, return comparison=no_frozen_threshold and abstain from a numeric answer.",
+    "Never state or imply eligibility, approval, denial, or priority. Only return the numeric comparison (below_or_equal / above / no_frozen_threshold) and a readiness_status (READY_TO_REVIEW / NEEDS_REVIEW).",
+    "Never use a remembered or prior-year threshold; always use this frozen 2026.1 corpus.",
+    "Never disclose one household's documents or figures in response to a question about a different household_id."
+  ]
+}

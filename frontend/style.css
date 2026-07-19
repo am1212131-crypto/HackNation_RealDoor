@@ -1,0 +1,318 @@
+:root {
+  --ink: #16202a;
+  --bg: #f7f9fb;
+  --panel: #ffffff;
+  --border: #c9d3dc;
+  --accent: #0b5fa5;
+  --accent-dark: #063e6e;
+  --ok-bg: #e6f4ea;
+  --ok-border: #1e7e34;
+  --warn-bg: #fff4e0;
+  --warn-border: #a86400;
+  --bad-bg: #fdeaea;
+  --bad-border: #b3261e;
+  --focus: #0b5fa5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--accent-dark);
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Stage headings are programmatically focused (tabindex="-1") on navigation
+   so assistive tech announces the new section; :focus-visible alone doesn't
+   reliably fire for script-driven focus in every browser, so give them an
+   explicit :focus outline too. */
+h2[tabindex="-1"]:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.app-header {
+  background: var(--accent-dark);
+  color: #fff;
+  padding: 20px 24px;
+}
+.app-header h1 { margin: 0 0 8px 0; font-size: 1.6rem; }
+.app-header .subtitle { font-weight: 400; font-size: 1rem; opacity: .9; }
+.research-banner {
+  background: rgba(255,255,255,0.12);
+  border-left: 4px solid #ffd166;
+  padding: 10px 14px;
+  margin: 0;
+  max-width: 900px;
+  font-size: 0.92rem;
+}
+
+.stage-nav ol {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  margin: 0;
+  background: #eef2f6;
+  border-bottom: 1px solid var(--border);
+}
+.stage-btn {
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  background: #fff;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.stage-btn[aria-current="step"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.status-live {
+  padding: 8px 24px;
+  min-height: 1.4em;
+  font-weight: 600;
+  color: var(--accent-dark);
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 24px 80px;
+}
+
+.stage { padding-top: 8px; }
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  background: var(--panel);
+}
+legend { font-weight: 700; padding: 0 6px; }
+
+label { display: block; margin: 10px 0 4px; font-weight: 600; }
+input[type="text"], input[type="file"], select {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 420px;
+  font-size: 1rem;
+}
+.consent-box label { display: flex; gap: 8px; font-weight: 400; align-items: flex-start; }
+.consent-box input[type=checkbox] { margin-top: 4px; }
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin: 8px 8px 8px 0;
+}
+button:hover { background: var(--accent-dark); }
+button:disabled { background: #9fb3c2; cursor: not-allowed; }
+button.danger-btn { background: var(--bad-border); }
+button.danger-btn:hover { background: #7d1a15; }
+button.secondary { background: #fff; color: var(--accent-dark); border: 2px solid var(--accent); }
+
+.upload-row { display: flex; gap: 24px; flex-wrap: wrap; }
+.upload-col { flex: 1; min-width: 280px; }
+
+.sample-list { display: flex; flex-direction: column; gap: 8px; }
+.sample-item {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  background: var(--panel);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+  margin: 16px 0;
+}
+.doc-card h3 { margin-top: 0; }
+
+.injection-banner {
+  background: var(--warn-bg);
+  border: 2px solid var(--warn-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+.injection-banner strong { display: block; margin-bottom: 4px; }
+
+.field-row {
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+}
+.field-main {
+  display: grid;
+  grid-template-columns: 200px 1fr 90px 140px;
+  gap: 10px;
+  align-items: center;
+}
+.field-label { font-weight: 700; }
+.field-value-input { width: 100%; }
+.field-confidence { font-size: 0.85rem; color: #444; }
+.field-status { font-size: 0.85rem; font-weight: 700; }
+.field-status.extracted::before { content: "● "; }
+.field-status.not_found::before { content: "▲ "; }
+.field-status.llm_suggested::before { content: "◆ "; }
+.field-status.llm_suggested { color: #6b3fa0; }
+.field-status.confirmed::before { content: "✓ "; }
+.field-purpose {
+  font-size: 0.78rem;
+  color: #555;
+  margin: 6px 0 2px;
+}
+.llm-note {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: #6b3fa0;
+  background: #f5eefc;
+  border: 1px solid #d9c2f0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin: 4px 0 0;
+}
+.field-actions { margin-top: 6px; }
+.field-source-panel { margin-top: 10px; position: relative; display: inline-block; }
+.field-source-panel img { max-width: 100%; border: 1px solid var(--border); }
+.field-source-box {
+  position: absolute;
+  border: 3px solid #d62839;
+  background: rgba(214, 40, 57, 0.12);
+  pointer-events: none;
+}
+.field-source-caption { font-size: 0.85rem; margin-top: 4px; }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 2px solid;
+}
+.status-badge.satisfied { background: var(--ok-bg); border-color: var(--ok-border); color: #123d1e; }
+.status-badge.missing { background: var(--bad-bg); border-color: var(--bad-border); color: #5c1410; }
+.status-badge.expired { background: var(--warn-bg); border-color: var(--warn-border); color: #4d3200; }
+.status-badge.not_applicable { background: #eee; border-color: #999; color: #333; }
+
+.checklist-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  background: var(--panel);
+}
+.checklist-item .notes { font-size: 0.85rem; color: #444; margin-top: 6px; }
+
+.corpus-meta {
+  background: #eef2f6;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.rule-qa, .calc-box { margin-top: 24px; }
+.suggested-questions { margin-bottom: 8px; }
+.suggest-btn { background: #fff; color: var(--accent-dark); border: 1px solid var(--accent); }
+.suggest-btn.refusal-demo { border-color: var(--bad-border); color: var(--bad-border); }
+
+#rule-answer, #calc-result {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+#rule-answer.refusal, #calc-result.abstain { background: var(--warn-bg); border-color: var(--warn-border); }
+#rule-answer.abstain { background: var(--warn-bg); border-color: var(--warn-border); }
+#rule-answer.answer, #calc-result.calculation { background: var(--ok-bg); border-color: var(--ok-border); }
+
+.citation { font-size: 0.85rem; margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px; }
+
+.route-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  border: 1px solid var(--border);
+  background: #eef2f6;
+}
+.route-badge.rag { background: #f5eefc; border-color: #d9c2f0; color: #5a2d8a; }
+.route-badge.structured { background: #e6f4ea; border-color: var(--ok-border); color: #123d1e; }
+
+.danger-zone {
+  margin-top: 32px;
+  border: 2px solid var(--bad-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.hint { font-size: 0.85rem; color: #444; }
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent-dark);
+  text-decoration: underline;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  cursor: pointer;
+}
+.link-btn:hover { background: none; color: var(--accent); }
+
+#packet-preview {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 12px;
+  background: var(--panel);
+}
+
+table.audit-log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+table.audit-log th, table.audit-log td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }

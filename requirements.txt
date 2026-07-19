@@ -1,0 +1,9 @@
+fastapi>=0.139
+uvicorn[standard]>=0.51
+python-multipart>=0.0.32
+pdfplumber>=0.11
+reportlab>=5.0
+cryptography>=49.0
+pillow>=12.0
+openai>=1.40
+python-dotenv>=1.0
